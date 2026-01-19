@@ -1,47 +1,108 @@
 {
-  "name": "@croct/ts-project",
+  "name": "@croct/plug-storyblok",
   "version": "0.0.0-dev",
-  "description": "A brief description about the project.",
+  "description": "Official integration bridge between Storyblok and Croct's SDK ecosystem.",
+  "license": "MIT",
   "author": {
     "name": "Croct",
-    "email": "lib+project-ts@croct.com",
-    "url": "https://github.com/croct-tech/project-ts"
+    "email": "lib+plug-storyblok@croct.com",
+    "url": "https://croct.com"
   },
-  "license": "UNLICENSED",
   "keywords": [
     "croct",
     "personalization",
-    "typescript"
+    "integration",
+    "javascript",
+    "typescript",
+    "storyblok"
   ],
-  "types": "index.d.ts",
-  "main": "index.js",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    "./*": {
+      "import": "./*.js",
+      "require": "./*.cjs"
+    }
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/croct-tech/project-ts.git"
+    "url": "git+https://github.com/croct-tech/plug-storyblok.git"
   },
   "bugs": {
-    "url": "https://github.com/croct-tech/project-ts/issues"
+    "url": "https://github.com/croct-tech/plug-storyblok/issues"
   },
-  "homepage": "https://github.com/croct-tech/project-ts",
+  "homepage": "https://github.com/croct-tech/plug-storyblok",
   "scripts": {
     "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "jest -c jest.config.js --coverage",
+    "test": "jest -c jest.config.mjs --coverage",
     "validate": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsup",
+    "postbuild": "./post-build.mjs"
+  },
+  "dependencies": {
+    "@croct/plug": "https://pkg.pr.new/@croct/plug@358",
+    "@croct/json": "^2.1.0",
+    "@croct/content-model": "^0.21",
+    "@storyblok/js": "^4.4.4",
+    "tslib": "^2.7.0"
   },
   "devDependencies": {
-    "@croct/eslint-plugin": "^0.7.0",
-    "@swc/jest": "^0.2.24",
-    "@types/jest": "^30.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0",
-    "jest": "^30.0.0",
-    "jest-extended": "^7.0.0",
-    "ts-node": "^10.8.2",
+    "react": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@croct/plug-react": "https://pkg.pr.new/@croct/plug-react@570",
+    "@croct/plug-next": "https://pkg.pr.new/@croct/plug-next@162",
+    "@storyblok/react": "^5.4.21",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@croct/eslint-plugin": "^0.8.0",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.0.0",
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/parser": "^8.53.0",
+    "esbuild-fix-imports-plugin": "^1.0.19",
+    "eslint": "^9.39.2",
+    "jest": "^29.3.1",
+    "@swc/jest": "^0.2.39",
+    "jest-environment-jsdom": "^29.3.1",
+    "tsup": "^8.4.0",
     "typescript": "^5.0.0"
   },
+  "peerDependencies": {
+    "react": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@croct/plug-react": "^0.14.0",
+    "@croct/plug-next": "^0.7.0",
+    "@storyblok/react": "^5.4.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "@croct/plug-react": {
+      "optional": true
+    },
+    "@croct/plug-next": {
+      "optional": true
+    },
+    "@storyblok/react": {
+      "optional": true
+    }
+  },
+  "browserslist": [
+    "last 1 version"
+  ],
   "files": [
     "**/*.js",
-    "**/*.ts"
+    "**/*.cjs",
+    "**/*.mjs",
+    "**/*.ts",
+    "**/*.mts",
+    "**/*.cts",
+    "**/*.map"
   ]
 }

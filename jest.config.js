@@ -1,8 +1,11 @@
-module.exports = {
+export default {
+    roots: ['<rootDir>'],
+    moduleNameMapper: {
+        '^@/(.*)$': '<rootDir>/src/$1',
+    },
     transform: {
         '^.+\\.ts$': '@swc/jest',
     },
-    setupFilesAfterEnv: ['jest-extended/all'],
     restoreMocks: true,
     resetMocks: true,
 };
