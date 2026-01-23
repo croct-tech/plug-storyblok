@@ -5,40 +5,40 @@
         <source media="(min-width: 769px) and (prefers-color-scheme: dark)" srcset="https://github.com/croct-tech/plug-js/blob/master/.github/assets/header-dark.svg">
         <source media="(max-width: 768px) and (prefers-color-scheme: dark)" srcset="https://github.com/croct-tech/plug-js/blob/master/.github/assets/header-dark-mobile.svg">
         <source media="(max-width: 768px) and (prefers-color-scheme: light)" srcset="https://github.com/croct-tech/plug-js/blob/master/.github/assets/header-light-mobile.svg">
-        <img src="https://github.com/croct-tech/plug-js/blob/master/.github/assets/header-light-mobile.svg" alt="Croct JavaScript SDK" title="Croct JavaScript SDK" width="100%">
+        <img src="https://github.com/croct-tech/plug-js/blob/master/.github/assets/header-light-mobile.svg" alt="Croct Storyblok Plugin" title="Croct Storyblok Plugin" width="100%">
     </picture>
   </a>
   <br/>
-  <strong>Croct JavaScript SDK</strong><br/>
-  Bring dynamic, personalized content natively into your applications.
+  <strong>Croct Storyblok Plugin</strong><br/>
+  Bring dynamic, personalized content natively into your Storyblok-powered applications.
 </p>
 <div align="center">
-    <strong>📘 <a href="https://docs.croct.com/reference/sdk/javascript/installation">Quick start &rarr;</a></strong>
+    <strong>📘 <a href="https://docs.croct.com/reference/sdk/storyblok/installation">Quick start &rarr;</a></strong>
 </div>
 <br/>
 <p align="center">
-    <a href="https://www.npmjs.com/package/@croct/plug"><img alt="Version" src="https://img.shields.io/npm/v/@croct/plug"/></a>
-    <img alt="Gzipped bundle size" src="https://img.badgesize.io/https:/cdn.croct.io/js/v1/lib/plug.js?style=flat&compression=gzip" />
-    <a href="https://qlty.sh/gh/croct-tech/projects/plug-js"><img src="https://qlty.sh/badges/116cbaf6-8bd6-4ae9-b755-75a6ece12f91/coverage.svg" alt="Code Coverage" /></a>
-<a href="https://qlty.sh/gh/croct-tech/projects/plug-js"><img src="https://qlty.sh/badges/116cbaf6-8bd6-4ae9-b755-75a6ece12f91/maintainability.svg" alt="Maintainability" /></a>
+    <a href="https://www.npmjs.com/package/@croct/plug-storyblok"><img alt="Version" src="https://img.shields.io/npm/v/@croct/plug-storyblok"/></a>
 </p>
 
 ## Introduction
 
 Croct is a headless CMS that helps you manage content, run AB tests, and personalize experiences without the hassle of complex integrations.
 
+This plugin provides seamless integration between Croct and Storyblok, allowing you to deliver personalized content within your Storyblok-managed stories.
+
 ## Installation
 
-Run this command to install the SDK:
+Run this command to install the plugin:
 
 ```sh
-npm install @croct/plug
+npm install @croct/plug-storyblok
 ```
-See our [quick start guide](https://docs.croct.com/reference/sdk/javascript/installation) for more details.
+
+See our [quick start guide](https://docs.croct.com/reference/sdk/storyblok/installation) for more details.
 
 ## Documentation
 
-Visit our [official documentation](https://docs.croct.com/reference/sdk/javascript/installation).
+Visit our [official documentation](https://docs.croct.com/reference/sdk/storyblok/installation).
 
 ## Support
 
@@ -46,10 +46,10 @@ Join our official [Slack channel](https://croct.link/community) to get help from
 
 ## Contribution
 
-Contributions are always welcome! 
+Contributions are always welcome!
 
-- Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/plug-js/issues).
-- For major changes, please [open an issue](https://github.com/croct-tech/plug-js/issues) first to discuss what you would like to change.
+- Report any bugs or issues on the [issue tracker](https://github.com/croct-tech/plug-storyblok/issues).
+- For major changes, please [open an issue](https://github.com/croct-tech/plug-storyblok/issues) first to discuss what you would like to change.
 - Please make sure to update tests as appropriate. Run tests with `npm test`.
 
 ## License

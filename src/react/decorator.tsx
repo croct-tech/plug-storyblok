@@ -1,8 +1,8 @@
-import {ComponentType, FunctionComponent} from 'react';
-import {SbSDKOptions} from '@storyblok/js';
-import {ContentFetcher} from '@/content';
-import {decoratePlugin} from '@/bridge/decorator';
-import {Slot} from '@/bridge/react/slot';
+import type {ComponentType, FunctionComponent} from 'react';
+import type {SbSDKOptions} from '@storyblok/js';
+import type {ApiDecorator} from '@/decorator';
+import {createOptionDecorator as createDefaultOptionDecorator} from '@/decorator';
+import {Slot} from '@/react/slot';
 
 type ComponentMap = {
     [key: string]: ComponentType<any>,
@@ -12,19 +12,17 @@ type BlockProps = {
     blok?: Record<string, any>,
 };
 
-export function createOptionDecorator(fetcher: ContentFetcher): <O extends SbSDKOptions>(options: O) => O {
+export function createOptionDecorator(decorator: ApiDecorator): <O extends SbSDKOptions>(options: O) => O {
+    const defaultDecorator = createDefaultOptionDecorator(decorator);
+
     return <O extends SbSDKOptions>(options: O): O => {
-        const result = {...options};
+        const resolvedOptions = {...options};
 
-        if ('components' in result && isComponentMap(result.components)) {
-            result.components = decorateComponentMap(result.components);
+        if ('components' in resolvedOptions && isComponentMap(resolvedOptions.components)) {
+            resolvedOptions.components = decorateComponentMap(resolvedOptions.components);
         }
 
-        if (result.use !== undefined) {
-            result.use = result.use.map(plugin => decoratePlugin(plugin, fetcher));
-        }
-
-        return result;
+        return defaultDecorator(resolvedOptions);
     };
 }
 
@@ -53,19 +51,12 @@ function decorateComponentMap(components: ComponentMap): ComponentMap {
     );
 }
 
-function getSlot(props: BlockProps): string | null {
-    if (
-        props.blok === undefined
-        || props.blok === null
-        || typeof props.blok.croct !== 'string'
-        || props.blok
-            .croct
-            .trim() === ''
-    ) {
+function getSlot({blok}: BlockProps): string | null {
+    if (typeof blok?.croct !== 'string' || blok.croct.trim() === '') {
         return null;
     }
 
-    return props.blok.croct;
+    return blok.croct;
 }
 
 function isComponentMap(value: any): value is ComponentMap {

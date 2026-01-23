@@ -1,18 +1,17 @@
-import {JsonObject, JsonValue} from '@croct/json';
-import {ContentDefinition, ContentDefinitionBundle} from '@croct/content-model/definition';
+import type {JsonObject, JsonValue} from '@croct/json';
+import type {ContentDefinition, ContentDefinitionBundle} from '@croct/content-model/definition';
 import type {FetchResponse} from '@croct/plug';
-import {DynamicSlotId} from '@croct/plug/slot';
+import type {DynamicSlotId} from '@croct/plug/slot';
 
 export type ContentFetcher = (id: string) => Promise<FetchResponse<DynamicSlotId>>;
 
 export async function resolveContent(content: JsonValue, fetcher: ContentFetcher): Promise<JsonValue> {
     if (isObject(content)) {
         if (typeof content.croct === 'string' && content.croct.trim() !== '') {
+            const {croct: slotId, ...rest} = content;
+
             return await fetcher(content.croct).then(
-                response => createStoryblokContent({
-                    schemas: response.metadata?.schema,
-                    content: response.content,
-                }),
+                response => createStoryblokContent(response.content, response.metadata?.schema) ?? rest,
             ).catch(() => content);
         }
 
@@ -35,25 +34,39 @@ export async function resolveContent(content: JsonValue, fetcher: ContentFetcher
     return content;
 }
 
+export function createStoryblokContent(
+    content: JsonObject,
+    schemas: ContentDefinitionBundle | undefined,
+): JsonObject | undefined {
+    if (schemas === undefined) {
+        return undefined;
+    }
+
+    return createStoryblokContentRecursively({
+        content: content,
+        schemas: schemas,
+    }) as JsonObject;
+}
+
 type ContentCreationContext = {
     content: JsonValue,
-    schemas?: ContentDefinitionBundle,
+    schemas: ContentDefinitionBundle,
     definition?: ContentDefinition,
 };
 
-export function createStoryblokContent(context: ContentCreationContext): JsonValue {
+function createStoryblokContentRecursively(context: ContentCreationContext): JsonValue | undefined {
     const {content, schemas, definition} = context;
 
     if (definition === undefined) {
         if (schemas !== undefined && isObject(content) && typeof content?._component === 'string') {
-            return createStoryblokContent({
+            return createStoryblokContentRecursively({
                 content: content,
                 schemas: schemas,
                 definition: schemas.root,
             });
         }
 
-        return content;
+        return undefined;
     }
 
     if (typeof content === 'number' && definition.type === 'number') {
@@ -61,19 +74,28 @@ export function createStoryblokContent(context: ContentCreationContext): JsonVal
     }
 
     if (Array.isArray(content) && definition.type === 'list') {
-        return content.map(
-            item => createStoryblokContent({
+        const elements: JsonValue[] = [];
+
+        for (const item of content) {
+            const itemContent = createStoryblokContentRecursively({
                 content: item,
                 schemas: schemas,
                 definition: definition.items,
-            }),
-        );
+            });
+
+            if (itemContent === undefined) {
+                return undefined;
+            }
+
+            elements.push(itemContent);
+        }
+
+        return elements;
     }
 
     if (typeof content === 'string') {
         if (definition.type === 'reference' && definition.id === '@croct/file') {
             return {
-                fieldtype: 'asset',
                 id: null,
                 alt: null,
                 name: '',
@@ -81,6 +103,7 @@ export function createStoryblokContent(context: ContentCreationContext): JsonVal
                 title: null,
                 filename: content,
                 copyright: null,
+                fieldtype: 'asset',
                 meta_data: {},
                 is_external_url: true,
             };
@@ -88,6 +111,7 @@ export function createStoryblokContent(context: ContentCreationContext): JsonVal
 
         if (definition.type === 'text' && definition.format === 'url') {
             return {
+                id: '',
                 linktype: 'url',
                 fieldtype: 'multilink',
                 url: content,
@@ -96,60 +120,72 @@ export function createStoryblokContent(context: ContentCreationContext): JsonVal
         }
     } else if (isObject(content)) {
         switch (definition.type) {
-            case 'structure':
+            case 'structure': {
+                const componentName = typeof content._component === 'string' && content._component.trim() !== ''
+                    ? getComponentName(content._component)
+                    : null;
+
+                if (componentName === null) {
+                    return undefined;
+                }
+
+                const entries: JsonObject = {};
+
+                for (const [key, value] of Object.entries(content)) {
+                    if (key === '_component' || key === '_type' || value === undefined) {
+                        continue;
+                    }
+
+                    if (definition.attributes[key] === undefined) {
+                        return undefined;
+                    }
+
+                    const attributeContent = createStoryblokContentRecursively({
+                        content: value,
+                        schemas: schemas,
+                        definition: definition.attributes[key].type,
+                    });
+
+                    if (attributeContent === undefined) {
+                        return undefined;
+                    }
+
+                    entries[key] = attributeContent;
+                }
+
                 return {
                     _uid: generateUid(),
-                    component: typeof content._component === 'string' && content._component.trim() !== ''
-                        ? getComponentName(content._component)
-                        : 'unknown',
-                    ...Object.fromEntries(
-                        Object.entries(content).flatMap(([key, value]) => {
-                            if (key === '_component' || key === '_type') {
-                                return [];
-                            }
-
-                            if (definition.attributes[key] !== undefined && value !== undefined) {
-                                return [[
-                                    key,
-                                    createStoryblokContent({
-                                        content: value,
-                                        schemas: schemas,
-                                        definition: definition.attributes[key].type,
-                                    }),
-                                ]];
-                            }
-
-                            return [[key, value]];
-                        }),
-                    ),
+                    component: componentName,
+                    ...entries,
                 };
+            }
 
             case 'union': {
                 const memberDefinition = definition.types[content._type as string];
 
-                if (memberDefinition !== undefined) {
-                    return createStoryblokContent({
-                        content: {...content, _component: content._type},
-                        schemas: schemas,
-                        definition: memberDefinition,
-                    });
+                if (memberDefinition === undefined) {
+                    return undefined;
                 }
 
-                break;
+                return createStoryblokContentRecursively({
+                    content: {...content, _component: content._type},
+                    schemas: schemas,
+                    definition: memberDefinition,
+                });
             }
 
             case 'reference': {
                 const referenceDefinition = schemas?.definitions[definition.id];
 
-                if (referenceDefinition !== undefined) {
-                    return createStoryblokContent({
-                        content: {...content, _component: definition.id},
-                        schemas: schemas,
-                        definition: referenceDefinition,
-                    });
+                if (referenceDefinition === undefined) {
+                    return undefined;
                 }
 
-                break;
+                return createStoryblokContentRecursively({
+                    content: {...content, _component: definition.id},
+                    schemas: schemas,
+                    definition: referenceDefinition,
+                });
             }
         }
     }
@@ -157,8 +193,14 @@ export function createStoryblokContent(context: ContentCreationContext): JsonVal
     return content;
 }
 
-function getComponentName(id: string): string {
-    return id.replace(/@.*$/, '');
+function getComponentName(id: string): string | null {
+    const name = id.replace(/@.*$/, '');
+
+    if (name.trim() === '') {
+        return null;
+    }
+
+    return name;
 }
 
 function generateUid(): string {

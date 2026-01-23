@@ -4,8 +4,10 @@ export default {
         '^@/(.*)$': '<rootDir>/src/$1',
     },
     transform: {
-        '^.+\\.ts$': '@swc/jest',
+        '^.+\\.tsx?$': '@swc/jest',
     },
+    testEnvironment: 'jsdom',
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     restoreMocks: true,
     resetMocks: true,
 };

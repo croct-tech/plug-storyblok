@@ -1,6 +1,7 @@
-import {ContentDefinitionBundle} from '@croct/content-model/definition';
-import {JsonObject} from '@croct/json';
-import {ContentFetcher, createStoryblokContent, resolveContent} from '@/content';
+import type {ContentDefinitionBundle} from '@croct/content-model/definition';
+import type {JsonObject} from '@croct/json';
+import type {ContentFetcher} from '@/content';
+import {createStoryblokContent, resolveContent} from '@/content';
 
 const RANDOM_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -30,9 +31,7 @@ describe('createStoryblokContent', () => {
                 number_attribute: 9,
                 boolean_attribute: false,
                 markdown_attribute: 'Lorem *ipsum*',
-                old_file_attribute: '//example.com/old-file.pdf',
                 date_time_attribute: '2026-01-01 01:02',
-                old_image_attribute: '//example.com/old-image.jpg',
                 text_area_attribute: 'Lorem ipsum',
                 multi_assets_attribute: [
                     'https://example.com/asset-1.png',
@@ -73,21 +72,9 @@ describe('createStoryblokContent', () => {
                                 type: 'text',
                             },
                         },
-                        old_file_attribute: {
-                            type: {
-                                type: 'text',
-                                format: 'url',
-                            },
-                        },
                         date_time_attribute: {
                             type: {
                                 type: 'text',
-                            },
-                        },
-                        old_image_attribute: {
-                            type: {
-                                type: 'text',
-                                format: 'url',
                             },
                         },
                         text_area_attribute: {
@@ -157,11 +144,11 @@ describe('createStoryblokContent', () => {
             },
             expected: {
                 _uid: RANDOM_UUID,
-                component: 'block_with_all_types_default',
+                component: 'page',
                 link_attribute: {
-                    id: 'f6e3790c-8e03-4d69-a0a8-ae1820e25d2e',
+                    id: '',
                     url: 'http://example.com',
-                    linktype: 'story',
+                    linktype: 'url',
                     fieldtype: 'multilink',
                     cached_url: 'http://example.com',
                 },
@@ -181,34 +168,32 @@ describe('createStoryblokContent', () => {
                 number_attribute: '9',
                 boolean_attribute: false,
                 markdown_attribute: 'Lorem *ipsum*',
-                old_file_attribute: '//example.com/old-file.pdf',
                 date_time_attribute: '2026-01-01 01:02',
-                old_image_attribute: '//example.com/old-image.jpg',
                 text_area_attribute: 'Lorem ipsum',
                 multi_assets_attribute: [
                     {
                         id: null,
-                        alt: '',
+                        alt: null,
                         name: '',
                         focus: '',
-                        title: '',
-                        source: '',
+                        title: null,
                         filename: 'https://example.com/asset-1.png',
-                        copyright: '',
+                        copyright: null,
                         fieldtype: 'asset',
                         meta_data: {},
+                        is_external_url: true,
                     },
                     {
                         id: null,
-                        alt: '',
+                        alt: null,
                         name: '',
                         focus: '',
-                        title: '',
-                        source: '',
+                        title: null,
                         filename: 'https://example.com/asset-2.png',
-                        copyright: '',
+                        copyright: null,
                         fieldtype: 'asset',
                         meta_data: {},
+                        is_external_url: true,
                     },
                 ],
                 multi_option_attribute: [
@@ -449,6 +434,7 @@ describe('createStoryblokContent', () => {
                     component: 'button-component',
                     label: 'Submit',
                     url: {
+                        id: '',
                         linktype: 'url',
                         fieldtype: 'multilink',
                         url: 'https://example.com/submit',
@@ -457,125 +443,8 @@ describe('createStoryblokContent', () => {
                 },
             },
         },
-        {
-            description: 'a structure with unknown attributes',
-            content: {
-                _component: 'card',
-                title: 'Known',
-                extraField: 'preserved',
-                anotherExtra: 123,
-            },
-            schemas: {
-                root: {
-                    type: 'structure',
-                    attributes: {
-                        title: {
-                            type: {
-                                type: 'text',
-                            },
-                        },
-                    },
-                },
-                definitions: {},
-            },
-            expected: {
-                _uid: RANDOM_UUID,
-                component: 'card',
-                title: 'Known',
-                extraField: 'preserved',
-                anotherExtra: 123,
-            },
-        },
-        {
-            description: 'a structure with an unknown reference definition',
-            content: {
-                _component: 'page',
-                widget: {
-                    _component: 'missing-widget',
-                    data: 'some value',
-                },
-            },
-            schemas: {
-                root: {
-                    type: 'structure',
-                    attributes: {
-                        widget: {
-                            type: {
-                                type: 'reference',
-                                id: 'non-existent-definition',
-                            },
-                        },
-                    },
-                },
-                definitions: {},
-            },
-            expected: {
-                _uid: RANDOM_UUID,
-                component: 'page',
-                widget: {
-                    _component: 'missing-widget',
-                    data: 'some value',
-                },
-            },
-        },
-        {
-            description: 'a structure with union member not in the definition',
-            content: {
-                _component: 'section',
-                media: {
-                    _type: 'audio',
-                    src: 'https://example.com/sound.mp3',
-                },
-            },
-            schemas: {
-                root: {
-                    type: 'structure',
-                    attributes: {
-                        media: {
-                            type: {
-                                type: 'union',
-                                types: {
-                                    image: {
-                                        type: 'structure',
-                                        attributes: {
-                                            src: {
-                                                type: {
-                                                    type: 'text',
-                                                },
-                                            },
-                                        },
-                                    },
-                                    video: {
-                                        type: 'structure',
-                                        attributes: {
-                                            url: {
-                                                type: {
-                                                    type: 'text',
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                definitions: {},
-            },
-            expected: {
-                _uid: RANDOM_UUID,
-                component: 'section',
-                media: {
-                    _type: 'audio',
-                    src: 'https://example.com/sound.mp3',
-                },
-            },
-        },
     ])('should create a Storyblok content for $description', scenario => {
-        const result = createStoryblokContent({
-            content: scenario.content,
-            schemas: scenario.schemas,
-        });
+        const result = createStoryblokContent(scenario.content, scenario.schemas);
 
         expect(result).toEqual(scenario.expected);
     });
@@ -620,19 +489,77 @@ describe('createStoryblokContent', () => {
                 definitions: {},
             },
         },
-    ])('should return content as-is when $description', ({content, schemas}) => {
-        const result = createStoryblokContent({
-            content: content,
-            schemas: schemas,
-        });
+        {
+            description: '_component is empty string',
+            content: {
+                _component: '',
+                title: 'Hello',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: '_component is whitespace only',
+            content: {
+                _component: '   ',
+                title: 'Hello',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: '_component results in empty name after stripping version',
+            content: {
+                _component: '@1.0.0',
+                title: 'Hello',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+    ])('should return undefined when $description', ({content, schemas}) => {
+        const result = createStoryblokContent(content, schemas);
 
-        expect(result).toEqual(content);
+        expect(result).toBeUndefined();
     });
 
-    it.each(['', undefined, 123])('should use "unknown" as component name when _component is %s', name => {
+    it('should return undefined when content has attribute not in schema definition', () => {
         const content = {
-            _component: name,
-            title: 'No component',
+            _component: 'page',
+            title: 'Hello',
+            unknownAttribute: 'value',
         };
 
         const schemas: ContentDefinitionBundle = {
@@ -649,23 +576,109 @@ describe('createStoryblokContent', () => {
             definitions: {},
         };
 
-        const result = createStoryblokContent({
-            content: content,
-            schemas: schemas,
-            definition: schemas.root,
-        });
+        const result = createStoryblokContent(content, schemas);
 
-        expect(result).toEqual({
-            _uid: RANDOM_UUID,
-            component: 'unknown',
-            title: 'No component',
-        });
+        expect(result).toBeUndefined();
+    });
+
+    it('should return undefined when union member type is not in definition', () => {
+        const content = {
+            _component: 'section',
+            media: {
+                _type: 'audio',
+                src: 'https://example.com/sound.mp3',
+            },
+        };
+
+        const schemas: ContentDefinitionBundle = {
+            root: {
+                type: 'structure',
+                attributes: {
+                    media: {
+                        type: {
+                            type: 'union',
+                            types: {
+                            },
+                        },
+                    },
+                },
+            },
+            definitions: {},
+        };
+
+        const result = createStoryblokContent(content, schemas);
+
+        expect(result).toBeUndefined();
+    });
+
+    it('should return undefined when list item cannot be resolved', () => {
+        const content = {
+            _component: 'cardList',
+            cards: [
+                {
+                    title: 'Valid Card',
+                },
+                {
+                    title: 'Invalid Card',
+                },
+            ],
+        };
+
+        const schemas: ContentDefinitionBundle = {
+            root: {
+                type: 'structure',
+                attributes: {
+                    cards: {
+                        type: {
+                            type: 'list',
+                            items: {
+                                type: 'reference',
+                                id: 'missing-definition',
+                            },
+                        },
+                    },
+                },
+            },
+            definitions: {},
+        };
+
+        const result = createStoryblokContent(content, schemas);
+
+        expect(result).toBeUndefined();
+    });
+
+    it('should return undefined when nested attribute content cannot be resolved', () => {
+        const content = {
+            _component: 'page',
+            header: {
+                title: 'Title',
+            },
+        };
+
+        const schemas: ContentDefinitionBundle = {
+            root: {
+                type: 'structure',
+                attributes: {
+                    header: {
+                        type: {
+                            type: 'reference',
+                            id: 'missing-definition',
+                        },
+                    },
+                },
+            },
+            definitions: {},
+        };
+
+        const result = createStoryblokContent(content, schemas);
+
+        expect(result).toBeUndefined();
     });
 });
 
 describe('resolveContent', () => {
     beforeEach(() => {
-        jest.spyOn(crypto, 'randomUUID').mockReturnValue(RANDOM_UUID);
+        jest.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(RANDOM_UUID);
     });
 
     afterEach(() => {
@@ -894,6 +907,7 @@ describe('resolveContent', () => {
             component: 'banner',
             message: 'Welcome!',
             url: {
+                id: '',
                 linktype: 'url',
                 fieldtype: 'multilink',
                 url: 'https://example.com/welcome',
@@ -907,8 +921,7 @@ describe('resolveContent', () => {
     it('should only resolve the outermost slot reference', async () => {
         const fetcher: ContentFetcher = jest.fn().mockResolvedValue({
             content: {
-                _component: 'outer',
-                croct: 'outer-slot',
+                _component: 'outer@1',
             },
             metadata: {
                 schema: {
@@ -931,18 +944,41 @@ describe('resolveContent', () => {
         await expect(resolveContent(content, fetcher)).resolves.toEqual({
             _uid: RANDOM_UUID,
             component: 'outer',
-            croct: 'outer-slot',
         });
 
         expect(fetcher).toHaveBeenCalledTimes(1);
         expect(fetcher).toHaveBeenCalledWith('outer-slot');
     });
 
-    it('should return original content then fetching fails', async () => {
+    it('should return original content when fetching fails', async () => {
         const fetcher: ContentFetcher = jest.fn().mockRejectedValue(new Error('Fetch failed'));
         const content = {croct: 'slot-id'};
 
         await expect(resolveContent(content, fetcher)).resolves.toEqual(content);
+
+        expect(fetcher).toHaveBeenCalledWith('slot-id');
+    });
+
+    it('should remove croct property and return fallback properties when content creation fails', async () => {
+        const fetcher: ContentFetcher = jest.fn().mockResolvedValue({
+            content: {
+                _component: 'widget',
+                data: 'fetched',
+            },
+            metadata: {
+                schema: undefined,
+            },
+        });
+
+        const content = {
+            croct: 'slot-id',
+            fallbackTitle: 'Fallback',
+            fallbackData: 123,
+        };
+
+        const {croct, ...expectedFallback} = content;
+
+        await expect(resolveContent(content, fetcher)).resolves.toEqual(expectedFallback);
 
         expect(fetcher).toHaveBeenCalledWith('slot-id');
     });
