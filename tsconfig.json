@@ -9,7 +9,7 @@
       "@testing-library/jest-dom",
       "node"
     ],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "declaration": true,
     "esModuleInterop": true,
@@ -35,7 +35,6 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "tes"
   ],
   "exclude": [
     "node_modules",
