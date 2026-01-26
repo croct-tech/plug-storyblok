@@ -66,29 +66,22 @@ describe('withCroct', () => {
 
     const mocks = {
         get createOptionDecorator() {
-            return jest.mocked(
-                jest.requireMock<typeof import('@/react/decorator')>('@/react/decorator').createOptionDecorator,
-            );
+            return jest.requireMock('@/react/decorator').createOptionDecorator;
         },
         get isSsr() {
-            return jest.mocked(jest.requireMock<typeof import('@/utils/ssr')>('@/utils/ssr').isSsr);
+            return jest.requireMock('@/utils/ssr').isSsr;
         },
         get fetchContent() {
-            return jest.mocked(
-                jest.requireMock<typeof import('@croct/plug-next/server')>('@croct/plug-next/server').fetchContent,
-            );
+            return jest.requireMock('@croct/plug-next/server').fetchContent;
         },
         get croctFetch() {
-            return jest.mocked(jest.requireMock<typeof import('@croct/plug')>('@croct/plug').default.fetch);
+            return jest.requireMock('@croct/plug').default.fetch;
         },
         get getRequestUri() {
-            return jest.mocked(
-                jest.requireMock<typeof import('@croct/plug-next/config/context')>('@croct/plug-next/config/context')
-                    .getRequestUri,
-            );
+            return jest.requireMock('@croct/plug-next/config/context').getRequestUri;
         },
         get isPreviewUrl() {
-            return jest.mocked(jest.requireMock<typeof import('@/utils/preview')>('@/utils/preview').isPreviewUrl);
+            return jest.requireMock('@/utils/preview').isPreviewUrl;
         },
     };
 
