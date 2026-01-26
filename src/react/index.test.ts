@@ -34,7 +34,7 @@ describe('withCroct', () => {
 
     const mocks = {
         get croctFetch() {
-            return jest.requireMock('@croct/plug').default.croctFetch;
+            return jest.requireMock('@croct/plug').default.fetch;
         },
         get createOptionDecorator() {
             return jest.requireMock('@/react/decorator').createOptionDecorator;
@@ -60,8 +60,7 @@ describe('withCroct', () => {
 
         const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
 
-        mocks.croctFetch
-            .mockResolvedValue(fetchedContent);
+        mocks.croctFetch.mockResolvedValue(fetchedContent);
 
         const result = await decorator.fetchContent('slot-id');
 

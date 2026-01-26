@@ -14,7 +14,7 @@ jest.mock(
 jest.mock(
     '@croct/plug-next/config/context',
     () => ({
-        getRequestUri: jest.fn(() => Promise.resolve('')),
+        getRequestUri: jest.fn(() => Promise.resolve('https://example.com/page')),
     }),
 );
 
@@ -66,22 +66,29 @@ describe('withCroct', () => {
 
     const mocks = {
         get createOptionDecorator() {
-            return jest.requireMock('@/react/decorator').createOptionDecorator;
+            return jest.mocked(
+                jest.requireMock<typeof import('@/react/decorator')>('@/react/decorator').createOptionDecorator,
+            );
         },
         get isSsr() {
-            return jest.requireMock('@/utils/ssr').isSsr;
+            return jest.mocked(jest.requireMock<typeof import('@/utils/ssr')>('@/utils/ssr').isSsr);
         },
         get fetchContent() {
-            return jest.requireMock('@croct/plug-next/server').fetchContent;
+            return jest.mocked(
+                jest.requireMock<typeof import('@croct/plug-next/server')>('@croct/plug-next/server').fetchContent,
+            );
         },
         get croctFetch() {
-            return jest.requireMock('@croct/plug').default.fetch;
+            return jest.mocked(jest.requireMock<typeof import('@croct/plug')>('@croct/plug').default.fetch);
         },
         get getRequestUri() {
-            return jest.requireMock('@croct/plug-next/config/context').getRequestUri;
+            return jest.mocked(
+                jest.requireMock<typeof import('@croct/plug-next/config/context')>('@croct/plug-next/config/context')
+                    .getRequestUri,
+            );
         },
         get isPreviewUrl() {
-            return jest.requireMock('@/utils/preview').isPreviewUrl;
+            return jest.mocked(jest.requireMock<typeof import('@/utils/preview')>('@/utils/preview').isPreviewUrl);
         },
     };
 
@@ -164,7 +171,7 @@ describe('withCroct', () => {
         });
 
         expect(mocks.getRequestUri).toHaveBeenCalledWith(context);
-        expect(mocks.isPreviewUrl).toHaveBeenCalledWith('https://example.com/page?_storyblok_c=123');
+        expect(mocks.isPreviewUrl).toHaveBeenCalledWith(await mocks.getRequestUri());
         expect(mocks.fetchContent).not.toHaveBeenCalled();
         expect(result).toBeUndefined();
     });
