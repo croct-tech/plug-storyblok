@@ -1,7 +1,7 @@
 import type {ContentDefinitionBundle} from '@croct/content-model/definition';
 import type {JsonObject} from '@croct/json';
-import type {ContentFetcher} from '@/content';
-import {createStoryblokContent, resolveContent} from '@/content';
+import type {ContentFetcher} from '@/utils/content';
+import {createStoryblokContent, resolveContent} from '@/utils/content';
 
 const RANDOM_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -950,11 +950,18 @@ describe('resolveContent', () => {
         expect(fetcher).toHaveBeenCalledWith('outer-slot');
     });
 
-    it('should return original content when fetching fails', async () => {
+    it('should remove croct property and return fallback properties when fetching fails', async () => {
         const fetcher: ContentFetcher = jest.fn().mockRejectedValue(new Error('Fetch failed'));
-        const content = {croct: 'slot-id'};
 
-        await expect(resolveContent(content, fetcher)).resolves.toEqual(content);
+        const content = {
+            croct: 'slot-id',
+            fallbackTitle: 'Fallback',
+            fallbackData: 123,
+        };
+
+        const {croct, ...expectedFallback} = content;
+
+        await expect(resolveContent(content, fetcher)).resolves.toEqual(expectedFallback);
 
         expect(fetcher).toHaveBeenCalledWith('slot-id');
     });
@@ -969,6 +976,22 @@ describe('resolveContent', () => {
                 schema: undefined,
             },
         });
+
+        const content = {
+            croct: 'slot-id',
+            fallbackTitle: 'Fallback',
+            fallbackData: 123,
+        };
+
+        const {croct, ...expectedFallback} = content;
+
+        await expect(resolveContent(content, fetcher)).resolves.toEqual(expectedFallback);
+
+        expect(fetcher).toHaveBeenCalledWith('slot-id');
+    });
+
+    it('should remove croct property and return fallback properties when fetcher returns undefined', async () => {
+        const fetcher: ContentFetcher = jest.fn().mockResolvedValue(undefined);
 
         const content = {
             croct: 'slot-id',

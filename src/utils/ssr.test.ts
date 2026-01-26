@@ -1,4 +1,4 @@
-import {isSsr} from '@/ssr';
+import {isSsr} from '@/utils/ssr';
 
 describe('isSsr', () => {
     const originalWindow = globalThis.window;

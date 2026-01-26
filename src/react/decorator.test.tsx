@@ -2,13 +2,13 @@ import type {ComponentType, FunctionComponent, ReactElement} from 'react';
 import type {SbSDKOptions} from '@storyblok/js';
 import {render, screen} from '@testing-library/react';
 import type {SbReactSDKOptions} from '@storyblok/react';
-import type {ApiDecorator} from '@/decorator';
+import type {ApiDecorator} from '@/utils/decorator';
 import {createOptionDecorator} from '@/react/decorator';
-import {createOptionDecorator as createDefaultOptionDecorator} from '@/decorator';
+import {createOptionDecorator as createDefaultOptionDecorator} from '@/utils/decorator';
 import {Slot} from '@/react/slot';
 
 jest.mock(
-    '@/decorator',
+    '@/utils/decorator',
     () => ({
         createOptionDecorator: jest.fn(),
     }),

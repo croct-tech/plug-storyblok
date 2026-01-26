@@ -1,8 +1,10 @@
 import type {ComponentType, FunctionComponent} from 'react';
 import type {SbSDKOptions} from '@storyblok/js';
-import type {ApiDecorator} from '@/decorator';
-import {createOptionDecorator as createDefaultOptionDecorator} from '@/decorator';
+import type {ApiDecorator} from '@/utils/decorator';
+import {createOptionDecorator as createDefaultOptionDecorator} from '@/utils/decorator';
 import {Slot} from '@/react/slot';
+import {isSsr} from '@/utils/ssr';
+import {isPreviewUrl} from '@/utils/preview';
 
 type ComponentMap = {
     [key: string]: ComponentType<any>,
@@ -34,7 +36,7 @@ function decorateComponentMap(components: ComponentMap): ComponentMap {
             const DecoratedComponent: FunctionComponent<BlockProps> = props => {
                 const slot = getSlot(props);
 
-                if (slot !== null) {
+                if (slot !== null && (isSsr() || !isPreviewUrl(window.location.href))) {
                     return (<Slot id={slot} component={originalKey} props={props} />);
                 }
 

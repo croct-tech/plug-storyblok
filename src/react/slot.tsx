@@ -3,7 +3,7 @@
 import type {FunctionComponent} from 'react';
 import {useContent} from '@croct/plug-react';
 import {StoryblokComponent} from '@storyblok/react';
-import {createStoryblokContent} from '@/content';
+import {createStoryblokContent} from '@/utils/content';
 
 type SlotProps = {
     id: string,

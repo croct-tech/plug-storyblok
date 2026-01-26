@@ -1,12 +1,12 @@
 import type {SbPluginFactory, StoryblokClient, SbSDKOptions} from '@storyblok/js';
 import type {ISbStoriesParams} from '@storyblok/react';
-import type {ApiDecorator} from '@/decorator';
-import {createOptionDecorator, decoratePlugin} from '@/decorator';
-import {resolveContent} from '@/content';
+import type {ApiDecorator} from '@/utils/decorator';
+import {createOptionDecorator, decoratePlugin} from '@/utils/decorator';
+import {resolveContent} from '@/utils/content';
 import mocked = jest.mocked;
 
 jest.mock(
-    '@/content',
+    '@/utils/content',
     () => ({
         resolveContent: jest.fn(),
     }),

@@ -2,7 +2,7 @@ import type {ContentDefinitionBundle} from '@croct/content-model/definition';
 import {render} from '@testing-library/react';
 import {useContent} from '@croct/plug-react';
 import {StoryblokComponent} from '@storyblok/react';
-import {createStoryblokContent} from '@/content';
+import {createStoryblokContent} from '@/utils/content';
 import {Slot} from '@/react/slot';
 
 jest.mock(
@@ -20,7 +20,7 @@ jest.mock(
 );
 
 jest.mock(
-    '@/content',
+    '@/utils/content',
     () => ({
         createStoryblokContent: jest.fn(),
     }),

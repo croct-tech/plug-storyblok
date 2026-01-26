@@ -1,12 +1,11 @@
 import type {SbPluginFactory, StoryblokClient, SbSDKOptions} from '@storyblok/js';
-import type {FetchResponse} from '@croct/plug';
-import type {DynamicSlotId} from '@croct/plug/slot';
 import type {ISbStoriesParams} from '@storyblok/react';
-import {resolveContent} from '@/content';
+import type {ContentFetcher} from '@/utils/content';
+import {resolveContent} from '@/utils/content';
 
 export type ApiDecorator = {
     resolveParams?: (params: ISbStoriesParams | undefined) => ISbStoriesParams | undefined,
-    fetchContent: (id: string, params?: ISbStoriesParams) => Promise<FetchResponse<DynamicSlotId>>,
+    fetchContent: (id: string, params?: ISbStoriesParams) => ReturnType<ContentFetcher>,
 };
 
 export function createOptionDecorator(decorator: ApiDecorator): <O extends SbSDKOptions>(options: O) => O {

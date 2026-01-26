@@ -2,12 +2,19 @@ import type {FetchOptions} from '@croct/plug-next/server';
 import type {FetchResponse} from '@croct/plug';
 import type {DynamicSlotId} from '@croct/plug/slot';
 import type {ISbStoriesParams} from '@storyblok/react';
-import type {ApiDecorator} from '@/decorator';
+import type {ApiDecorator} from '@/utils/decorator';
 
 jest.mock(
     '@croct/plug-next/server',
     () => ({
         fetchContent: jest.fn(),
+    }),
+);
+
+jest.mock(
+    '@croct/plug-next/config/context',
+    () => ({
+        getRequestUri: jest.fn(() => Promise.resolve('')),
     }),
 );
 
@@ -22,9 +29,16 @@ jest.mock(
 );
 
 jest.mock(
-    '@/ssr',
+    '@/utils/ssr',
     () => ({
         isSsr: jest.fn(),
+    }),
+);
+
+jest.mock(
+    '@/utils/preview',
+    () => ({
+        isPreviewUrl: jest.fn(),
     }),
 );
 
@@ -36,7 +50,7 @@ jest.mock(
 );
 
 describe('withCroct', () => {
-    afterEach(() => {
+    beforeEach(() => {
         jest.resetModules();
         jest.clearAllMocks();
     });
@@ -55,13 +69,19 @@ describe('withCroct', () => {
             return jest.requireMock('@/react/decorator').createOptionDecorator;
         },
         get isSsr() {
-            return jest.requireMock('@/ssr').isSsr;
+            return jest.requireMock('@/utils/ssr').isSsr;
         },
         get fetchContent() {
             return jest.requireMock('@croct/plug-next/server').fetchContent;
         },
         get croctFetch() {
             return jest.requireMock('@croct/plug').default.fetch;
+        },
+        get getRequestUri() {
+            return jest.requireMock('@croct/plug-next/config/context').getRequestUri;
+        },
+        get isPreviewUrl() {
+            return jest.requireMock('@/utils/preview').isPreviewUrl;
         },
     };
 
@@ -107,6 +127,7 @@ describe('withCroct', () => {
 
     it('should call fetchContent from plug-next/server when fetchContent is called in SSR environment', async () => {
         mocks.isSsr.mockReturnValue(true);
+        mocks.isPreviewUrl.mockReturnValue(false);
 
         await import('@/next/index');
 
@@ -127,8 +148,52 @@ describe('withCroct', () => {
         expect(result).toBe(fetchedContent);
     });
 
+    it('should return undefined in SSR when URL is a preview URL to avoid overwriting content', async () => {
+        mocks.isSsr.mockReturnValue(true);
+        mocks.isPreviewUrl.mockReturnValue(true);
+
+        await import('@/next/index');
+
+        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
+
+        const context = {} as FetchOptions['route'];
+
+        const result = await decorator.fetchContent('slot-id', {
+            version: 'draft',
+            route: context,
+        });
+
+        expect(mocks.getRequestUri).toHaveBeenCalledWith(context);
+        expect(mocks.isPreviewUrl).toHaveBeenCalledWith('https://example.com/page?_storyblok_c=123');
+        expect(mocks.fetchContent).not.toHaveBeenCalled();
+        expect(result).toBeUndefined();
+    });
+
+    it('should fetch content normally when request context is not available in SSR', async () => {
+        mocks.isSsr.mockReturnValue(true);
+        mocks.getRequestUri.mockRejectedValue(new Error('No request context'));
+        mocks.fetchContent.mockResolvedValue(fetchedContent);
+
+        await import('@/next/index');
+
+        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
+
+        const context = {} as FetchOptions['route'];
+
+        const result = await decorator.fetchContent('slot-id', {
+            version: 'draft',
+            route: context,
+        });
+
+        expect(mocks.getRequestUri).toHaveBeenCalledWith(context);
+        expect(mocks.isPreviewUrl).not.toHaveBeenCalled();
+        expect(mocks.fetchContent).toHaveBeenCalledWith('slot-id', {includeSchema: true, route: context});
+        expect(result).toBe(fetchedContent);
+    });
+
     it('should call croct.fetch when fetchContent is called in browser environment', async () => {
         mocks.isSsr.mockReturnValue(false);
+        mocks.isPreviewUrl.mockReturnValue(false);
 
         await import('@/next/index');
 
@@ -142,5 +207,20 @@ describe('withCroct', () => {
 
         expect(croctFetch).toHaveBeenCalledWith('slot-id', {includeSchema: true});
         expect(result).toBe(fetchedContent);
+    });
+
+    it('should return undefined in browser when URL is a preview URL to avoid overwriting content', async () => {
+        mocks.isSsr.mockReturnValue(false);
+        mocks.isPreviewUrl.mockReturnValue(true);
+
+        await import('@/next/index');
+
+        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
+
+        const result = await decorator.fetchContent('slot-id');
+
+        expect(mocks.isPreviewUrl).toHaveBeenCalledWith(window.location.href);
+        expect(mocks.croctFetch).not.toHaveBeenCalled();
+        expect(result).toBeUndefined();
     });
 });
