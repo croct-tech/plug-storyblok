@@ -674,6 +674,431 @@ describe('createStoryblokContent', () => {
 
         expect(result).toBeUndefined();
     });
+
+    type TypeMismatchScenario = {
+        description: string,
+        content: JsonObject,
+        schemas: ContentDefinitionBundle,
+    };
+
+    it.each<TypeMismatchScenario>([
+        {
+            description: 'number content when definition expects text',
+            content: {
+                _component: 'page',
+                title: 42,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'number content when definition expects boolean',
+            content: {
+                _component: 'page',
+                flag: 1,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        flag: {
+                            type: {
+                                type: 'boolean',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'boolean content when definition expects text',
+            content: {
+                _component: 'page',
+                title: true,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'boolean content when definition expects number',
+            content: {
+                _component: 'page',
+                count: false,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        count: {
+                            type: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'string content when definition expects number',
+            content: {
+                _component: 'page',
+                count: 'not a number',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        count: {
+                            type: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'string content when definition expects boolean',
+            content: {
+                _component: 'page',
+                flag: 'true',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        flag: {
+                            type: {
+                                type: 'boolean',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'string content when definition expects list',
+            content: {
+                _component: 'page',
+                items: 'not an array',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        items: {
+                            type: {
+                                type: 'list',
+                                items: {
+                                    type: 'text',
+                                },
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'string content when definition expects structure',
+            content: {
+                _component: 'page',
+                header: 'not an object',
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        header: {
+                            type: {
+                                type: 'structure',
+                                attributes: {},
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'array content when definition expects text',
+            content: {
+                _component: 'page',
+                title: ['a', 'b'],
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'array content when definition expects number',
+            content: {
+                _component: 'page',
+                count: [1, 2, 3],
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        count: {
+                            type: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'array content when definition expects structure',
+            content: {
+                _component: 'page',
+                header: ['a', 'b'],
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        header: {
+                            type: {
+                                type: 'structure',
+                                attributes: {},
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'object content when definition expects text',
+            content: {
+                _component: 'page',
+                title: {nested: 'value'},
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'object content when definition expects number',
+            content: {
+                _component: 'page',
+                count: {nested: 'value'},
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        count: {
+                            type: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'object content when definition expects boolean',
+            content: {
+                _component: 'page',
+                flag: {nested: 'value'},
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        flag: {
+                            type: {
+                                type: 'boolean',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'object content when definition expects list',
+            content: {
+                _component: 'page',
+                items: {nested: 'value'},
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        items: {
+                            type: {
+                                type: 'list',
+                                items: {
+                                    type: 'text',
+                                },
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'null content when definition expects text',
+            content: {
+                _component: 'page',
+                title: null,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        title: {
+                            type: {
+                                type: 'text',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'null content when definition expects number',
+            content: {
+                _component: 'page',
+                count: null,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        count: {
+                            type: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'null content when definition expects boolean',
+            content: {
+                _component: 'page',
+                flag: null,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        flag: {
+                            type: {
+                                type: 'boolean',
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'null content when definition expects list',
+            content: {
+                _component: 'page',
+                items: null,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        items: {
+                            type: {
+                                type: 'list',
+                                items: {
+                                    type: 'text',
+                                },
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+        {
+            description: 'null content when definition expects structure',
+            content: {
+                _component: 'page',
+                header: null,
+            },
+            schemas: {
+                root: {
+                    type: 'structure',
+                    attributes: {
+                        header: {
+                            type: {
+                                type: 'structure',
+                                attributes: {},
+                            },
+                        },
+                    },
+                },
+                definitions: {},
+            },
+        },
+    ])('should return undefined when $description', ({content, schemas}) => {
+        const result = createStoryblokContent(content, schemas);
+
+        expect(result).toBeUndefined();
+    });
 });
 
 describe('resolveContent', () => {
