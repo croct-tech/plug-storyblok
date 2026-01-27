@@ -11,6 +11,9 @@ type SlotProps = {
     props?: Record<string, any>,
 };
 
+/**
+ * @internal
+ */
 export const Slot: FunctionComponent<SlotProps> = ({id, component, props}) => {
     const {content, metadata} = useContent(id, {
         includeSchema: true,

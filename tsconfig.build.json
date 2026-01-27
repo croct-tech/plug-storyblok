@@ -3,7 +3,8 @@
   "compilerOptions": {
     "noEmit": false,
     "rootDir": "src",
-    "outDir": "build"
+    "outDir": "build",
+    "stripInternal": true,
   },
   "exclude": [
     "node_modules",
