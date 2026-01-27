@@ -175,13 +175,18 @@ function convertObject(
 function convertStructure(
     content: JsonObject,
     schemas: ContentDefinitionBundle,
-    definition: Extract<ContentDefinition, {type: 'structure'}>,
+    definition: ContentDefinition<'structure'>,
 ): JsonObject | undefined {
     const componentName = typeof content._component === 'string' && content._component.trim() !== ''
         ? getComponentName(content._component)
         : null;
 
     if (componentName === null) {
+        // Storyblok requires every structure to have an associated component. For root,
+        // reference, and union types, the _component property is injected during conversion.
+        // However, nested structures have no associated component, so a missing component
+        // here indicates a schema mismatch. This should never occur in practice since
+        // Storyblok doesn't support nested structures without components.
         return undefined;
     }
 
