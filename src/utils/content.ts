@@ -3,8 +3,14 @@ import type {ContentDefinition, ContentDefinitionBundle} from '@croct/content-mo
 import type {FetchResponse} from '@croct/plug';
 import type {DynamicSlotId} from '@croct/plug/slot';
 
+/**
+ * @internal
+ */
 export type ContentFetcher = (id: string) => Promise<FetchResponse<DynamicSlotId> | undefined>;
 
+/**
+ * @internal
+ */
 export async function resolveContent(content: JsonValue, fetcher: ContentFetcher): Promise<JsonValue> {
     if (isObject(content)) {
         if (typeof content.croct === 'string' && content.croct.trim() !== '') {
@@ -40,6 +46,9 @@ export async function resolveContent(content: JsonValue, fetcher: ContentFetcher
     return content;
 }
 
+/**
+ * @internal
+ */
 export function createStoryblokContent(
     content: JsonObject,
     schemas: ContentDefinitionBundle | undefined,

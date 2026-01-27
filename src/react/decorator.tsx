@@ -14,6 +14,9 @@ type BlockProps = {
     blok?: Record<string, any>,
 };
 
+/**
+ * @internal
+ */
 export function createOptionDecorator(decorator: ApiDecorator): <O extends SbSDKOptions>(options: O) => O {
     const defaultDecorator = createDefaultOptionDecorator(decorator);
 

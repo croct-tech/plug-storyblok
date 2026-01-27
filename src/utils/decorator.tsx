@@ -3,11 +3,17 @@ import type {ISbStoriesParams} from '@storyblok/react';
 import type {ContentFetcher} from '@/utils/content';
 import {resolveContent} from '@/utils/content';
 
+/**
+ * @internal
+ */
 export type ApiDecorator = {
     resolveParams?: (params: ISbStoriesParams | undefined) => ISbStoriesParams | undefined,
     fetchContent: (id: string, params?: ISbStoriesParams) => ReturnType<ContentFetcher>,
 };
 
+/**
+ * @internal
+ */
 export function createOptionDecorator(decorator: ApiDecorator): <O extends SbSDKOptions>(options: O) => O {
     return <O extends SbSDKOptions>(options: O): O => {
         const result = {...options};
@@ -20,6 +26,9 @@ export function createOptionDecorator(decorator: ApiDecorator): <O extends SbSDK
     };
 }
 
+/**
+ * @internal
+ */
 export function decoratePlugin(plugin: SbPluginFactory, decorator: ApiDecorator): SbPluginFactory {
     return options => {
         const result = plugin(options) as {storyblokApi?: StoryblokClient};
