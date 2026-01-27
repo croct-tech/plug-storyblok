@@ -43,14 +43,14 @@
   "dependencies": {
     "@croct/content-model": "^0.21",
     "@croct/json": "^2.1.0",
-    "@croct/plug": "https://pkg.pr.new/@croct/plug@358",
+    "@croct/plug": "^0.21.0",
     "@storyblok/js": "^4.4.4",
     "tslib": "^2.7.0"
   },
   "devDependencies": {
     "@croct/eslint-plugin": "^0.8.0",
-    "@croct/plug-next": "https://pkg.pr.new/@croct/plug-next@162",
-    "@croct/plug-react": "https://pkg.pr.new/@croct/plug-react@570",
+    "@croct/plug-next": "^0.8.0",
+    "@croct/plug-react": "^0.15.0",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.0.0",
@@ -72,8 +72,8 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "@croct/plug-next": "https://pkg.pr.new/@croct/plug-next@162",
-    "@croct/plug-react": "https://pkg.pr.new/@croct/plug-react@570",
+    "@croct/plug-next": "^0.8.0",
+    "@croct/plug-react": "^0.15.0",
     "@storyblok/react": "^5.4.0",
     "react": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.8.0  || ^17.0.0 || ^18.0.0 || ^19.0.0"
