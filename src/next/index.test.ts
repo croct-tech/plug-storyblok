@@ -43,6 +43,13 @@ jest.mock(
 );
 
 jest.mock(
+    'next/headers',
+    () => ({
+        headers: jest.fn(),
+    }),
+);
+
+jest.mock(
     '@/react/decorator',
     () => ({
         createOptionDecorator: jest.fn(() => jest.fn()),
@@ -82,6 +89,9 @@ describe('withCroct', () => {
         },
         get isPreviewUrl() {
             return jest.requireMock('@/utils/preview').isPreviewUrl;
+        },
+        get headers() {
+            return jest.requireMock('next/headers').headers;
         },
     };
 
@@ -222,5 +232,32 @@ describe('withCroct', () => {
         expect(mocks.isPreviewUrl).toHaveBeenCalledWith(window.location.href);
         expect(mocks.croctFetch).not.toHaveBeenCalled();
         expect(result).toBeUndefined();
+    });
+
+    it('should call headers() when beforeRequest is called in SSR environment', async () => {
+        mocks.isSsr.mockReturnValue(true);
+        mocks.headers.mockResolvedValue(new Headers());
+
+        await import('@/next/index');
+
+        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
+
+        expect(decorator.beforeRequest).toBeDefined();
+
+        const result = decorator.beforeRequest!();
+
+        expect(result).toBeInstanceOf(Promise);
+        await expect(result).resolves.toBeUndefined();
+        expect(mocks.headers).toHaveBeenCalled();
+    });
+
+    it('should set beforeRequest to undefined in browser environment', async () => {
+        mocks.isSsr.mockReturnValue(false);
+
+        await import('@/next/index');
+
+        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
+
+        expect(decorator.beforeRequest).toBeUndefined();
     });
 });

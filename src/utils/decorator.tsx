@@ -7,6 +7,7 @@ import {resolveContent} from '@/utils/content';
  * @internal
  */
 export type ApiDecorator = {
+    beforeRequest?: () => Promise<void> | void,
     resolveParams?: (params: ISbStoriesParams | undefined) => ISbStoriesParams | undefined,
     fetchContent: (id: string, params?: ISbStoriesParams) => ReturnType<ContentFetcher>,
 };
@@ -42,6 +43,8 @@ export function decoratePlugin(plugin: SbPluginFactory, decorator: ApiDecorator)
         const get = storyblokApi.get.bind(storyblokApi);
 
         storyblokApi.get = async (path: string, params, ...args): Promise<any> => {
+            await decorator.beforeRequest?.();
+
             const resolvedParams = decorator.resolveParams?.(params) ?? params;
 
             if (path.startsWith('cdn/stories/')) {
@@ -57,6 +60,8 @@ export function decoratePlugin(plugin: SbPluginFactory, decorator: ApiDecorator)
         const getAll = storyblokApi.getAll.bind(storyblokApi);
 
         storyblokApi.getAll = async (path: string, params, ...args): Promise<any> => {
+            await decorator.beforeRequest?.();
+
             const resolvedParams = decorator.resolveParams?.(params) ?? params;
 
             if (path.startsWith('cdn/stories/')) {
@@ -71,21 +76,25 @@ export function decoratePlugin(plugin: SbPluginFactory, decorator: ApiDecorator)
 
         const getStory = storyblokApi.getStory.bind(storyblokApi);
 
-        storyblokApi.getStory = async (slug: string, params, ...args): Promise<any> => (
-            resolveContent(
+        storyblokApi.getStory = async (slug: string, params, ...args): Promise<any> => {
+            await decorator.beforeRequest?.();
+
+            return resolveContent(
                 await getStory(slug, decorator.resolveParams?.(params) ?? params, ...args) as any,
                 id => decorator.fetchContent(id, params),
-            )
-        );
+            );
+        };
 
         const getStories = storyblokApi.getStories.bind(storyblokApi);
 
-        storyblokApi.getStories = async (params, ...args): Promise<any> => (
-            resolveContent(
+        storyblokApi.getStories = async (params, ...args): Promise<any> => {
+            await decorator.beforeRequest?.();
+
+            return resolveContent(
                 await getStories(decorator.resolveParams?.(params) ?? params, ...args) as any,
                 id => decorator.fetchContent(id, params),
-            )
-        );
+            );
+        };
 
         return result;
     };
