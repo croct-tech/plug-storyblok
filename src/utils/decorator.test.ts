@@ -112,14 +112,22 @@ describe('decoratePlugin', () => {
     });
 
     describe('get method', () => {
-        it('should resolve content for cdn/stories/ path', async () => {
+        it('should call beforeRequest and resolve content for cdn/stories/ path', async () => {
             const {originalGet, plugin} = createMocks();
             const responseData = {story: {content: {}}};
 
-            originalGet.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGet.mockImplementation(() => {
+                callOrder.push('get');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -128,19 +136,28 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.get('cdn/stories/home', params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'get']);
             expect(originalGet).toHaveBeenCalledWith('cdn/stories/home', params);
             expect(resolveContent).toHaveBeenCalledWith(responseData, expect.any(Function));
             expect(result).toEqual(responseData);
         });
 
-        it('should not resolve content for non cdn/stories/ path', async () => {
+        it('should call beforeRequest and not resolve content for non cdn/stories/ path', async () => {
             const {originalGet, plugin} = createMocks();
             const responseData = {links: []};
 
-            originalGet.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGet.mockImplementation(() => {
+                callOrder.push('get');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -149,6 +166,7 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.get('cdn/links/', params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'get']);
             expect(originalGet).toHaveBeenCalledWith('cdn/links/', params);
             expect(resolveContent).not.toHaveBeenCalled();
             expect(result).toEqual(responseData);
@@ -249,14 +267,22 @@ describe('decoratePlugin', () => {
     });
 
     describe('getAll method', () => {
-        it('should resolve content for cdn/stories/ path', async () => {
+        it('should call beforeRequest and resolve content for cdn/stories/ path', async () => {
             const {originalGetAll, plugin} = createMocks();
             const responseData = [{story: {content: {}}}];
 
-            originalGetAll.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGetAll.mockImplementation(() => {
+                callOrder.push('getAll');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -265,19 +291,28 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.getAll('cdn/stories/', params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'getAll']);
             expect(originalGetAll).toHaveBeenCalledWith('cdn/stories/', params);
             expect(resolveContent).toHaveBeenCalledWith(responseData, expect.any(Function));
             expect(result).toEqual(responseData);
         });
 
-        it('should not resolve content for non cdn/stories/ path', async () => {
+        it('should call beforeRequest and not resolve content for non cdn/stories/ path', async () => {
             const {originalGetAll, plugin} = createMocks();
             const responseData = [{link: {}}];
 
-            originalGetAll.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGetAll.mockImplementation(() => {
+                callOrder.push('getAll');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -286,6 +321,7 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.getAll('cdn/links/', params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'getAll']);
             expect(originalGetAll).toHaveBeenCalledWith('cdn/links/', params);
             expect(resolveContent).not.toHaveBeenCalled();
             expect(result).toEqual(responseData);
@@ -385,14 +421,22 @@ describe('decoratePlugin', () => {
     });
 
     describe('getStory method', () => {
-        it('should resolve content', async () => {
+        it('should call beforeRequest and resolve content', async () => {
             const {originalGetStory, plugin} = createMocks();
             const responseData = {story: {content: {}}};
 
-            originalGetStory.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGetStory.mockImplementation(() => {
+                callOrder.push('getStory');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -401,6 +445,7 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.getStory('home', params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'getStory']);
             expect(originalGetStory).toHaveBeenCalledWith('home', params);
             expect(resolveContent).toHaveBeenCalledWith(responseData, expect.any(Function));
             expect(result).toEqual(responseData);
@@ -477,14 +522,22 @@ describe('decoratePlugin', () => {
     });
 
     describe('getStories method', () => {
-        it('should resolve content', async () => {
+        it('should call beforeRequest and resolve content', async () => {
             const {originalGetStories, plugin} = createMocks();
             const responseData = {stories: [{content: {}}]};
 
-            originalGetStories.mockResolvedValue(responseData);
+            const callOrder: string[] = [];
+            const beforeRequest = jest.fn(() => { callOrder.push('beforeRequest'); });
+
+            originalGetStories.mockImplementation(() => {
+                callOrder.push('getStories');
+
+                return Promise.resolve(responseData);
+            });
 
             const decorator: ApiDecorator = {
                 fetchContent: jest.fn(),
+                beforeRequest: beforeRequest,
             };
             const decorated = decoratePlugin(plugin, decorator);
             const pluginResult = decorated({accessToken: 'token'});
@@ -493,6 +546,7 @@ describe('decoratePlugin', () => {
             const params: ISbStoriesParams = {version: 'draft'};
             const result = await decoratedApi.getStories(params);
 
+            expect(callOrder).toEqual(['beforeRequest', 'getStories']);
             expect(originalGetStories).toHaveBeenCalledWith(params);
             expect(resolveContent).toHaveBeenCalledWith(responseData, expect.any(Function));
             expect(result).toEqual(responseData);
