@@ -19,12 +19,9 @@ jest.mock(
 );
 
 jest.mock(
-    '@croct/plug',
+    '@/utils/fetch',
     () => ({
-        __esModule: true,
-        default: {
-            fetch: jest.fn(),
-        },
+        fetchBrowserContent: jest.fn(),
     }),
 );
 
@@ -68,6 +65,7 @@ describe('withCroct', () => {
         },
         metadata: {
             version: '1.0',
+            contentSource: 'experience',
         },
     };
 
@@ -80,9 +78,6 @@ describe('withCroct', () => {
         },
         get fetchContent() {
             return jest.requireMock('@croct/plug-next/server').fetchContent;
-        },
-        get croctFetch() {
-            return jest.requireMock('@croct/plug').default.fetch;
         },
         get getRequestUri() {
             return jest.requireMock('@croct/plug-next/config/context').getRequestUri;
@@ -201,37 +196,14 @@ describe('withCroct', () => {
         expect(result).toBe(fetchedContent);
     });
 
-    it('should call croct.fetch when fetchContent is called in browser environment', async () => {
+    it('should use fetchBrowserContent in browser environment', async () => {
         mocks.isSsr.mockReturnValue(false);
-        mocks.isPreviewUrl.mockReturnValue(false);
 
         await import('@/next/index');
 
         const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
 
-        const {croctFetch} = mocks;
-
-        croctFetch.mockResolvedValue(fetchedContent);
-
-        const result = await decorator.fetchContent('slot-id');
-
-        expect(croctFetch).toHaveBeenCalledWith('slot-id', {includeSchema: true});
-        expect(result).toBe(fetchedContent);
-    });
-
-    it('should return undefined in browser when URL is a preview URL to avoid overwriting content', async () => {
-        mocks.isSsr.mockReturnValue(false);
-        mocks.isPreviewUrl.mockReturnValue(true);
-
-        await import('@/next/index');
-
-        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
-
-        const result = await decorator.fetchContent('slot-id');
-
-        expect(mocks.isPreviewUrl).toHaveBeenCalledWith(window.location.href);
-        expect(mocks.croctFetch).not.toHaveBeenCalled();
-        expect(result).toBeUndefined();
+        expect(decorator.fetchContent).toBe(jest.requireMock('@/utils/fetch').fetchBrowserContent);
     });
 
     it('should call headers() when beforeRequest is called in SSR environment', async () => {

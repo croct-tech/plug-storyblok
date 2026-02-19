@@ -1,14 +1,9 @@
-import type {FetchResponse} from '@croct/plug';
-import type {DynamicSlotId} from '@croct/plug/slot';
 import type {ApiDecorator} from '@/utils/decorator';
 
 jest.mock(
-    '@croct/plug',
+    '@/utils/fetch',
     () => ({
-        __esModule: true,
-        default: {
-            fetch: jest.fn(),
-        },
+        fetchBrowserContent: jest.fn(),
     }),
 );
 
@@ -19,13 +14,6 @@ jest.mock(
     }),
 );
 
-jest.mock(
-    '@/utils/preview',
-    () => ({
-        isPreviewUrl: jest.fn(),
-    }),
-);
-
 describe('withCroct', () => {
     beforeEach(() => {
         jest.resetModules();
@@ -33,52 +21,19 @@ describe('withCroct', () => {
     });
 
     const mocks = {
-        get croctFetch() {
-            return jest.requireMock('@croct/plug').default.fetch;
-        },
         get createOptionDecorator() {
             return jest.requireMock('@/react/decorator').createOptionDecorator;
         },
-        get isPreviewUrl() {
-            return jest.requireMock('@/utils/preview').isPreviewUrl;
+        get fetchBrowserContent() {
+            return jest.requireMock('@/utils/fetch').fetchBrowserContent;
         },
     };
 
-    const fetchedContent: FetchResponse<DynamicSlotId> = {
-        content: {
-            _component: null,
-        },
-        metadata: {
-            version: '1.0',
-        },
-    };
-
-    it('should call croct.fetch with includeSchema option when fetchContent is called', async () => {
-        mocks.isPreviewUrl.mockReturnValue(false);
-
+    it('should use fetchBrowserContent as the fetchContent implementation', async () => {
         await import('@/react/index');
 
         const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
 
-        mocks.croctFetch.mockResolvedValue(fetchedContent);
-
-        const result = await decorator.fetchContent('slot-id');
-
-        expect(mocks.croctFetch).toHaveBeenCalledWith('slot-id', {includeSchema: true});
-        expect(result).toBe(fetchedContent);
-    });
-
-    it('should return undefined when in preview mode to avoid overwriting content', async () => {
-        mocks.isPreviewUrl.mockReturnValue(true);
-
-        await import('@/react/index');
-
-        const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
-
-        const result = await decorator.fetchContent('slot-id');
-
-        expect(mocks.isPreviewUrl).toHaveBeenCalledWith(window.location.href);
-        expect(mocks.croctFetch).not.toHaveBeenCalled();
-        expect(result).toBeUndefined();
+        expect(decorator.fetchContent).toBe(mocks.fetchBrowserContent);
     });
 });

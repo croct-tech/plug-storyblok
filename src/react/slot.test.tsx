@@ -76,6 +76,7 @@ describe('Slot', () => {
             content: content,
             metadata: {
                 version: '1.0',
+                contentSource: 'experience',
                 schema: schema,
             },
         });
@@ -159,6 +160,32 @@ describe('Slot', () => {
             expect.objectContaining({
                 blok: {
                     _uid: '123',
+                    component: 'test_original',
+                },
+            }),
+            undefined,
+        );
+    });
+
+    it('should not overwrite content when content source is a slot', () => {
+        const originalBlok = {_uid: '123', title: 'Original'};
+
+        jest.mocked(useContent).mockReturnValue({
+            content: {_component: 'hero', title: 'Fetched'},
+            metadata: {
+                version: '1.0',
+                contentSource: 'slot',
+            },
+        });
+
+        render(<Slot id="slot-id" component="test_original" props={{blok: originalBlok}} />);
+
+        expect(createStoryblokContent).not.toHaveBeenCalled();
+
+        expect(StoryblokComponent).toHaveBeenCalledWith(
+            expect.objectContaining({
+                blok: {
+                    ...originalBlok,
                     component: 'test_original',
                 },
             }),
