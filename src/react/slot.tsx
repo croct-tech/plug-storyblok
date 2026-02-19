@@ -26,7 +26,11 @@ export const Slot: FunctionComponent<SlotProps> = ({id, component, props}) => {
             {...props}
             blok={{
                 ...props?.blok,
-                ...createStoryblokContent(content, metadata?.schema),
+                ...(
+                    metadata?.contentSource === 'slot'
+                        ? {}
+                        : createStoryblokContent(content, metadata?.schema)
+                ),
                 component: component,
             }}
         />

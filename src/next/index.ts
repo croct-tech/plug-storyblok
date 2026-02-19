@@ -1,10 +1,10 @@
 import {fetchContent, type FetchOptions} from '@croct/plug-next/server';
-import croct from '@croct/plug';
 import {getRequestUri} from '@croct/plug-next/config/context';
 import {headers} from 'next/headers';
 import {isSsr} from '@/utils/ssr';
 import {createOptionDecorator} from '@/react/decorator';
 import {isPreviewUrl} from '@/utils/preview';
+import {fetchBrowserContent} from '@/utils/fetch';
 
 export const withCroct = createOptionDecorator({
     /*
@@ -29,19 +29,18 @@ export const withCroct = createOptionDecorator({
                 return undefined;
             }
 
-            return fetchContent(id, {
+            const response = await fetchContent(id, {
                 includeSchema: true,
                 route: params?.route,
             });
-        }
-        : id => {
-            if (isPreviewUrl(window.location.href)) {
-                // Do not overwrite content in preview mode
-                return Promise.resolve(undefined);
+
+            if (response.metadata?.contentSource === 'slot') {
+                return undefined;
             }
 
-            return croct.fetch(id, {includeSchema: true});
-        },
+            return response;
+        }
+        : fetchBrowserContent,
     resolveParams: params => {
         if (params === undefined) {
             return undefined;
