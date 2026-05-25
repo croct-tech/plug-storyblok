@@ -230,21 +230,21 @@ describe('withCroct', () => {
 
         const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
 
-        const fetchClientContent = jest.requireMock('@/utils/fetch').fetchClientContent;
+        const {fetchClientContent} = jest.requireMock('@/utils/fetch');
 
         await decorator.fetchContent('slot-id', {language: 'de'});
 
         expect(fetchClientContent).toHaveBeenCalledWith('slot-id', {preferredLocale: 'de'});
     });
 
-    it('should forward undefined locale to fetchClientContent when language is not provided in browser environment', async () => {
+    it('should forward undefined locale when language is not provided in browser environment', async () => {
         mocks.isSsr.mockReturnValue(false);
 
         await import('@/next/index');
 
         const decorator: ApiDecorator = mocks.createOptionDecorator.mock.calls[0][0];
 
-        const fetchClientContent = jest.requireMock('@/utils/fetch').fetchClientContent;
+        const {fetchClientContent} = jest.requireMock('@/utils/fetch');
 
         await decorator.fetchContent('slot-id');
 
