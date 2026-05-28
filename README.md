@@ -13,7 +13,7 @@
   Bring dynamic, personalized content natively into your Storyblok-powered applications.
 </p>
 <div align="center">
-    <strong>📘 <a href="https://docs.croct.com/reference/sdk/storyblok/installation">Quick start &rarr;</a></strong>
+    <strong>📘 <a href="https://docs.croct.com/reference/sdk/storyblok/integration">Quick start &rarr;</a></strong>
 </div>
 <br/>
 <p align="center">
@@ -34,11 +34,11 @@ Run this command to install the plugin:
 npm install @croct/plug-storyblok
 ```
 
-See our [quick start guide](https://docs.croct.com/reference/sdk/storyblok/installation) for more details.
+See our [quick start guide](https://docs.croct.com/reference/sdk/storyblok/integration) for more details.
 
 ## Documentation
 
-Visit our [official documentation](https://docs.croct.com/reference/sdk/storyblok/installation).
+Visit our [official documentation](https://docs.croct.com/reference/sdk/storyblok/integration).
 
 ## Support
 
