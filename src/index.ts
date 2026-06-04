@@ -1,1 +1,1 @@
-export {resolveContent, ContentFetcher} from '@/utils/content';
+export {resolveContent, type ContentFetcher} from '@/utils/content';
