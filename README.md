@@ -9,7 +9,7 @@
     </picture>
   </a>
   <br/>
-  <strong>Croct Storyblok Plugin</strong><br/>
+  <strong>Croct Storyblok Plugin for JS</strong><br/>
   Bring dynamic, personalized content natively into your Storyblok-powered applications.
 </p>
 <div align="center">
