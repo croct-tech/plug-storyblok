@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/croct-tech/plug-storyblok.git"
+    "url": "git+https://github.com/croct-tech/plug-storyblok-js.git"
   },
   "bugs": {
     "url": "https://github.com/croct-tech/plug-storyblok/issues"
